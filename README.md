@@ -1,57 +1,23 @@
-# Project Name
+---
+page_type: sample
+languages:
+  - csharp
+products:
+  - azure
+  - azure-cognitive-services
+  - azure-event-hubs
+azureDeploy: https://raw.githubusercontent.com/Azure-Samples/gaming-cognitive-services-speech-to-text/master/azuredeploy.json
+description: "Help bring everyone into the conversation by converting speech audio to text."
+---
 
-(short, 1-3 sentenced, description of the project)
+# Speech to Text for Gaming - Reference Architecture
 
-## Features
+Help bring everyone into the conversation by converting speech audio to text.
 
-This project framework provides the following features:
+## Deploy
 
-* Feature 1
-* Feature 2
-* ...
+To deploy the reference architecture to your own account, use the button below.
 
-## Getting Started
+<a href="https://aka.ms/arm-gaming-cognitive-services-speech-to-text" target="_blank"><img src="https://azuredeploy.net/deploybutton.png"/></a>
 
-### Prerequisites
-
-(ideally very short, if any)
-
-- OS
-- Library version
-- ...
-
-### Installation
-
-(ideally very short)
-
-- npm install [package name]
-- mvn install
-- ...
-
-### Quickstart
-(Add steps to get up and running quickly)
-
-1. git clone [repository clone url]
-2. cd [respository name]
-3. ...
-
-
-## Demo
-
-A demo app is included to show how to use the project.
-
-To run the demo, follow these steps:
-
-(Add steps to start up the demo)
-
-1.
-2.
-3.
-
-## Resources
-
-(Any additional resources or related projects)
-
-- Link to supporting information
-- Link to similar sample
-- ...
+Then, please see the full documentation on the [Speech to Text Reference Architecture](https://docs.microsoft.com/gaming/azure/reference-architectures/cognitive-speech-to-text) to learn how it all works.
