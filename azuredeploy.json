@@ -1,470 +1,193 @@
 {
-	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-	"contentVersion": "1.0.0.0",
-	"parameters": {
-		"sites_STTSampleApp_name": {
-			"defaultValue": "STTSampleApp",
-			"type": "String"
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        },
+        "speechToTextName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Speech To Text service"
+            }
+        },
+        "speechToTextTier": {
+            "type": "String",
+			"allowedValues": [
+				"F0",
+				"S0"
+			],
+			"defaultValue": "F0",
+            "metadata": {
+                "description": "Pricing tier"
+            }
+        },
+		"functionName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the Azure Function app to create"
+			}
 		},
-		"serverfarms_ASP_STTSample_9db5_name": {
-			"defaultValue": "ASP-STTSample-9db5",
-			"type": "String"
+		"functionAppSKU": {
+			"type": "string",
+			"allowedValues": [
+				"Free",
+				"Basic",
+				"Standard"
+			],
+			"defaultValue": "Standard",
+			"metadata": {
+				"description": "The pricing tier for the Function App hosting plan."
+			}
 		},
-		"accounts_STTSpeech_name": {
-			"defaultValue": "STTSpeech",
-			"type": "String"
+		"functionAppSKUCode": {
+			"type": "string",
+			"allowedValues": [
+				"F1",
+				"B1",
+				"S1"
+			],
+			"defaultValue": "S1",
+			"metadata": {
+				"description": "The pricing tier for the Function App hosting plan."
+			}
 		},
-		"storageAccounts_storageaccountsttsa96b8_name": {
-			"defaultValue": "storageaccountsttsa96b8",
-			"type": "String"
+		"functionAppWorkerSize": {
+			"type": "string",
+			"allowedValues": [
+				"0",
+				"1",
+				"2"
+			],
+			"defaultValue": "0",
+			"metadata": {
+				"description": "The instance size of the hosting plan (small, medium, or large)"
+			}
 		},
-		"smartdetectoralertrules_failure_anomalies___sttsampleapp_name": {
-			"defaultValue": "failure anomalies - sttsampleapp",
-			"type": "String"
+		"repoUrl": {
+			"type": "string",
+			"defaultValue": "https://github.com/Azure-Samples/gaming-cognitive-services-speech-to-text"
 		},
-		"components_sttsampleapp_externalid": {
-			"defaultValue": "/subscriptions/e64b9cf9-7bb6-4b9d-a03d-bf9b4bca745d/resourceGroups/sttsample/providers/microsoft.insights/components/sttsampleapp",
-			"type": "String"
-		},
-		"actiongroups_application_insights_smart_detection_externalid": {
-			"defaultValue": "/subscriptions/e64b9cf9-7bb6-4b9d-a03d-bf9b4bca745d/resourceGroups/atg-web-services/providers/microsoft.insights/actiongroups/application insights smart detection",
-			"type": "String"
-		}
+		"branch": {
+			"type": "string",
+			"defaultValue": "master"
+        }
+    },
+    "variables": {
+	    "functionAppName": "[parameters('functionName')]",
+		"hostingPlanName": "[parameters('functionName')]",
+		"storageAccountName": "[concat(uniquestring(resourceGroup().id), 'cstts')]"
 	},
-	"variables": {},
-	"resources": [
-		{
-			"type": "microsoft.alertsmanagement/smartdetectoralertrules",
-			"apiVersion": "2019-06-01",
-			"name": "[parameters('smartdetectoralertrules_failure_anomalies___sttsampleapp_name')]",
-			"location": "global",
-			"properties": {
-				"description": "Failure Anomalies notifies you of an unusual rise in the rate of failed HTTP requests or dependency calls.",
-				"state": "Enabled",
-				"severity": "Sev3",
-				"frequency": "PT1M",
-				"detector": {
-					"id": "FailureAnomaliesDetector",
-					"name": "Failure Anomalies",
-					"description": "Detects if your application experiences an abnormal rise in the rate of HTTP requests or dependency calls that are reported as failed. The anomaly detection uses machine learning algorithms and occurs in near real time, therefore there's no need to define a frequency for this signal.<br/></br/>To help you triage and diagnose the problem, an analysis of the characteristics of the failures and related telemetry is provided with the detection. This feature works for any app, hosted in the cloud or on your own servers, that generates request or dependency telemetry - for example, if you have a worker role that calls <a class=\"ext-smartDetecor-link\" href=\\\"https://docs.microsoft.com/azure/application-insights/app-insights-api-custom-events-metrics#trackrequest\\\" target=\\\"_blank\\\">TrackRequest()</a> or <a class=\"ext-smartDetecor-link\" href=\\\"https://docs.microsoft.com/azure/application-insights/app-insights-api-custom-events-metrics#trackdependency\\\" target=\\\"_blank\\\">TrackDependency()</a>.<br/><br/><a class=\"ext-smartDetecor-link\" href=\\\"https://docs.microsoft.com/azure/azure-monitor/app/proactive-failure-diagnostics\\\" target=\\\"_blank\\\">Learn more about Failure Anomalies</a>",
-					"supportedResourceTypes": [
-						"ApplicationInsights"
-					]
-				},
-				"scope": [
-					"[parameters('components_sttsampleapp_externalid')]"
-				],
-				"actionGroups": {
-					"groupIds": [
-						"[parameters('actiongroups_application_insights_smart_detection_externalid')]"
-					]
-				}
+    "resources": [
+	    {
+		"apiVersion": "2017-05-10",
+		"name": "pid-bd8668dd-62b4-47fc-a1d4-b74b0e08d8f6",
+		"comments": "GUID for tracking production pilot deployments intended for Gaming-Text-To-Speech.",
+		"type": "Microsoft.Resources/deployments",
+		"properties": {
+		    "mode": "Incremental",
+		    "template": {
+			    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+				"contentVersion": "1.0.0.0",
+				"resources": []
 			}
-		},
+		    }
+	    },
+        {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "sku": {
+                "name": "[parameters('speechToTextTier')]"
+            },
+            "kind": "SpeechServices",
+            "name": "[parameters('speechToTextName')]",
+            "apiVersion": "2016-02-01-preview",
+            "location": "[parameters('location')]",
+            "scale": null,
+            "properties": {},
+            "dependsOn": []
+        },
 		{
-			"type": "Microsoft.CognitiveServices/accounts",
-			"apiVersion": "2017-04-18",
-			"name": "[parameters('accounts_STTSpeech_name')]",
-			"location": "westus",
-			"sku": {
-				"name": "F0"
-			},
-			"kind": "SpeechServices",
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageAccountName')]",
+            "apiVersion": "2018-07-01",
+            "location": "[parameters('location')]",
+            "kind": "BlockBlobStorage",
+            "sku": {
+                "name": "Premium_LRS",
+				 "tier": "Premium"
+            },
 			"properties": {
-				"privateEndpointConnections": [],
-				"publicNetworkAccess": "Enabled"
-			}
-		},
-		{
-			"type": "Microsoft.Storage/storageAccounts",
-			"apiVersion": "2020-08-01-preview",
-			"name": "[parameters('storageAccounts_storageaccountsttsa96b8_name')]",
-			"location": "westus",
-			"sku": {
-				"name": "Standard_LRS",
-				"tier": "Standard"
-			},
-			"kind": "Storage",
-			"properties": {
-				"minimumTlsVersion": "TLS1_2",
-				"networkAcls": {
-					"bypass": "AzureServices",
-					"virtualNetworkRules": [],
-					"ipRules": [],
-					"defaultAction": "Allow"
-				},
-				"supportsHttpsTrafficOnly": true,
-				"encryption": {
-					"services": {
-						"file": {
-							"keyType": "Account",
-							"enabled": true
-						},
-						"blob": {
-							"keyType": "Account",
-							"enabled": true
-						}
-					},
-					"keySource": "Microsoft.Storage"
-				}
-			}
-		},
+                 "accessTier": "Hot"
+            }
+        },
 		{
 			"type": "Microsoft.Web/serverfarms",
-			"apiVersion": "2018-02-01",
-			"name": "[parameters('serverfarms_ASP_STTSample_9db5_name')]",
-			"location": "West US",
-			"sku": {
-				"name": "Y1",
-				"tier": "Dynamic",
-				"size": "Y1",
-				"family": "Y",
-				"capacity": 0
+			"apiVersion": "2016-09-01",
+			"name": "[variables('hostingPlanName')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"name": "[variables('hostingPlanName')]",
+				"workerSizeId": "[parameters('functionAppWorkerSize')]",
+				"hostingEnvironment": "",
+				"numberOfWorkers": 1
 			},
-			"kind": "functionapp",
-			"properties": {
-				"perSiteScaling": false,
-				"maximumElasticWorkerCount": 1,
-				"isSpot": false,
-				"reserved": false,
-				"isXenon": false,
-				"hyperV": false,
-				"targetWorkerCount": 0,
-				"targetWorkerSizeId": 0
-			}
-		},
-		{
-			"type": "Microsoft.Storage/storageAccounts/blobServices",
-			"apiVersion": "2020-08-01-preview",
-			"name": "[concat(parameters('storageAccounts_storageaccountsttsa96b8_name'), '/default')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountsttsa96b8_name'))]"
-			],
 			"sku": {
-				"name": "Standard_LRS",
-				"tier": "Standard"
-			},
-			"properties": {
-				"cors": {
-					"corsRules": []
-				},
-				"deleteRetentionPolicy": {
-					"enabled": false
-				}
-			}
+				"Tier": "[parameters('functionAppSKU')]",
+				"Name": "[parameters('functionAppSKUCode')]"
+			}			
 		},
 		{
-			"type": "Microsoft.Storage/storageAccounts/fileServices",
-			"apiVersion": "2020-08-01-preview",
-			"name": "[concat(parameters('storageAccounts_storageaccountsttsa96b8_name'), '/default')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountsttsa96b8_name'))]"
-			],
-			"sku": {
-				"name": "Standard_LRS",
-				"tier": "Standard"
-			},
-			"properties": {
-				"protocolSettings": {
-					"smb": {}
-				},
-				"cors": {
-					"corsRules": []
-				}
-			}
-		},
-		{
-			"type": "Microsoft.Storage/storageAccounts/queueServices",
-			"apiVersion": "2020-08-01-preview",
-			"name": "[concat(parameters('storageAccounts_storageaccountsttsa96b8_name'), '/default')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountsttsa96b8_name'))]"
-			],
-			"properties": {
-				"cors": {
-					"corsRules": []
-				}
-			}
-		},
-		{
-			"type": "Microsoft.Storage/storageAccounts/tableServices",
-			"apiVersion": "2020-08-01-preview",
-			"name": "[concat(parameters('storageAccounts_storageaccountsttsa96b8_name'), '/default')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountsttsa96b8_name'))]"
-			],
-			"properties": {
-				"cors": {
-					"corsRules": []
-				}
-			}
-		},
-		{
+			"apiVersion": "2016-08-01",
 			"type": "Microsoft.Web/sites",
-			"apiVersion": "2018-11-01",
-			"name": "[parameters('sites_STTSampleApp_name')]",
-			"location": "West US",
-			"dependsOn": [
-				"[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_STTSample_9db5_name'))]"
-			],
+			"name": "[variables('functionAppName')]",
+			"location": "[parameters('location')]",
 			"kind": "functionapp",
 			"properties": {
-				"enabled": true,
-				"hostNameSslStates": [
-					{
-						"name": "sttsampleapp.azurewebsites.net",
-						"sslState": "Disabled",
-						"hostType": "Standard"
-					},
-					{
-						"name": "sttsampleapp.scm.azurewebsites.net",
-						"sslState": "Disabled",
-						"hostType": "Repository"
-					}
-				],
-				"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_STTSample_9db5_name'))]",
-				"reserved": false,
-				"isXenon": false,
-				"hyperV": false,
-				"siteConfig": {},
-				"scmSiteAlsoStopped": false,
-				"clientAffinityEnabled": true,
-				"clientCertEnabled": false,
-				"hostNamesDisabled": false,
-				"containerSize": 1536,
-				"dailyMemoryTimeQuota": 0,
-				"httpsOnly": false,
-				"redundancyMode": "None"
-			}
-		},
-		{
-			"type": "Microsoft.Web/sites/config",
-			"apiVersion": "2018-11-01",
-			"name": "[concat(parameters('sites_STTSampleApp_name'), '/web')]",
-			"location": "West US",
+				"name": "[variables('functionAppName')]",
+				"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+				"hostingEnvironment": "",
+				"clientAffinityEnabled": false,
+				"siteConfig": {
+					"alwaysOn": true
+				}
+			},
 			"dependsOn": [
-				"[resourceId('Microsoft.Web/sites', parameters('sites_STTSampleApp_name'))]"
+				"[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+				"[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
 			],
-			"properties": {
-				"numberOfWorkers": 1,
-				"defaultDocuments": [
-					"Default.htm",
-					"Default.html",
-					"Default.asp",
-					"index.htm",
-					"index.html",
-					"iisstart.htm",
-					"default.aspx",
-					"index.php"
-				],
-				"netFrameworkVersion": "v4.0",
-				"phpVersion": "5.6",
-				"requestTracingEnabled": false,
-				"remoteDebuggingEnabled": false,
-				"remoteDebuggingVersion": "VS2019",
-				"httpLoggingEnabled": false,
-				"logsDirectorySizeLimit": 35,
-				"detailedErrorLoggingEnabled": false,
-				"publishingUsername": "$STTSampleApp",
-				"azureStorageAccounts": {},
-				"scmType": "None",
-				"use32BitWorkerProcess": true,
-				"webSocketsEnabled": false,
-				"alwaysOn": false,
-				"managedPipelineMode": "Integrated",
-				"virtualApplications": [
-					{
-						"virtualPath": "/",
-						"physicalPath": "site\\wwwroot",
-						"preloadEnabled": false
-					}
-				],
-				"loadBalancing": "LeastRequests",
-				"experiments": {
-					"rampUpRules": []
-				},
-				"autoHealEnabled": false,
-				"cors": {
-					"allowedOrigins": [
-						"https://functions.azure.com",
-						"https://functions-staging.azure.com",
-						"https://functions-next.azure.com"
+			"resources": [
+				{
+					"apiVersion": "2016-08-01",
+					"name": "appsettings",
+					"type": "config",
+					"dependsOn": [
+						"[resourceId('Microsoft.Web/sites', variables('functionAppName'))]",
+						"[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
 					],
-					"supportCredentials": false
+					"properties": {
+						"AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2015-05-01-preview').key1,';')]",
+						"AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2015-05-01-preview').key1,';')]",
+						"FUNCTIONS_EXTENSION_VERSION": "~2"
+					}
 				},
-				"localMySqlEnabled": false,
-				"ipSecurityRestrictions": [
-					{
-						"ipAddress": "Any",
-						"action": "Allow",
-						"priority": 1,
-						"name": "Allow all",
-						"description": "Allow all access"
-					}
-				],
-				"scmIpSecurityRestrictions": [
-					{
-						"ipAddress": "Any",
-						"action": "Allow",
-						"priority": 1,
-						"name": "Allow all",
-						"description": "Allow all access"
-					}
-				],
-				"scmIpSecurityRestrictionsUseMain": false,
-				"http20Enabled": false,
-				"minTlsVersion": "1.2",
-				"ftpsState": "AllAllowed",
-				"reservedInstanceCount": 0
-			}
-		},
-		{
-			"type": "Microsoft.Web/sites/deployments",
-			"apiVersion": "2018-11-01",
-			"name": "[concat(parameters('sites_STTSampleApp_name'), '/4f7f525c89b74ff89a85514976232fad')]",
-			"location": "West US",
-			"dependsOn": [
-				"[resourceId('Microsoft.Web/sites', parameters('sites_STTSampleApp_name'))]"
-			],
-			"properties": {
-				"status": 4,
-				"author_email": "N/A",
-				"author": "N/A",
-				"deployer": "ZipDeploy",
-				"message": "Created via a push deployment",
-				"start_time": "2021-01-26T23:31:50.6841464Z",
-				"end_time": "2021-01-26T23:31:54.8333245Z",
-				"active": false
-			}
-		},
-		{
-			"type": "Microsoft.Web/sites/deployments",
-			"apiVersion": "2018-11-01",
-			"name": "[concat(parameters('sites_STTSampleApp_name'), '/57bb21ecb50443eba151af7412293d67')]",
-			"location": "West US",
-			"dependsOn": [
-				"[resourceId('Microsoft.Web/sites', parameters('sites_STTSampleApp_name'))]"
-			],
-			"properties": {
-				"status": 4,
-				"author_email": "N/A",
-				"author": "N/A",
-				"deployer": "ZipDeploy",
-				"message": "Created via a push deployment",
-				"start_time": "2021-01-26T23:23:23.3382123Z",
-				"end_time": "2021-01-26T23:23:28.3241263Z",
-				"active": false
-			}
-		},
-		{
-			"type": "Microsoft.Web/sites/deployments",
-			"apiVersion": "2018-11-01",
-			"name": "[concat(parameters('sites_STTSampleApp_name'), '/5fa42a92479d442bb989f7d631292cd4')]",
-			"location": "West US",
-			"dependsOn": [
-				"[resourceId('Microsoft.Web/sites', parameters('sites_STTSampleApp_name'))]"
-			],
-			"properties": {
-				"status": 4,
-				"author_email": "N/A",
-				"author": "N/A",
-				"deployer": "ZipDeploy",
-				"message": "Created via a push deployment",
-				"start_time": "2021-01-26T23:00:39.1299736Z",
-				"end_time": "2021-01-26T23:00:43.7357349Z",
-				"active": false
-			}
-		},
-		{
-			"type": "Microsoft.Web/sites/deployments",
-			"apiVersion": "2018-11-01",
-			"name": "[concat(parameters('sites_STTSampleApp_name'), '/ccdc8cd7beec4e09bdf4e56b8682b05d')]",
-			"location": "West US",
-			"dependsOn": [
-				"[resourceId('Microsoft.Web/sites', parameters('sites_STTSampleApp_name'))]"
-			],
-			"properties": {
-				"status": 4,
-				"author_email": "N/A",
-				"author": "N/A",
-				"deployer": "ZipDeploy",
-				"message": "Created via a push deployment",
-				"start_time": "2021-01-27T00:30:45.0758787Z",
-				"end_time": "2021-01-27T00:30:50.2184573Z",
-				"active": true
-			}
-		},
-		{
-			"type": "Microsoft.Web/sites/functions",
-			"apiVersion": "2018-11-01",
-			"name": "[concat(parameters('sites_STTSampleApp_name'), '/SpeechToText')]",
-			"location": "West US",
-			"dependsOn": [
-				"[resourceId('Microsoft.Web/sites', parameters('sites_STTSampleApp_name'))]"
-			],
-			"properties": {
-				"script_root_path_href": "https://sttsampleapp.azurewebsites.net/admin/vfs/site/wwwroot/SpeechToText/",
-				"script_href": "https://sttsampleapp.azurewebsites.net/admin/vfs/site/wwwroot/bin/SpeechToText.dll",
-				"config_href": "https://sttsampleapp.azurewebsites.net/admin/vfs/site/wwwroot/SpeechToText/function.json",
-				"href": "https://sttsampleapp.azurewebsites.net/admin/functions/SpeechToText",
-				"config": {},
-				"test_data": "{\"method\":\"post\",\"queryStringParams\":[],\"headers\":[{\"name\":\"Language\",\"value\":\"en-US\"}],\"body\":{\"body\":\"\"}}"
-			}
-		},
-		{
-			"type": "Microsoft.Web/sites/hostNameBindings",
-			"apiVersion": "2018-11-01",
-			"name": "[concat(parameters('sites_STTSampleApp_name'), '/', parameters('sites_STTSampleApp_name'), '.azurewebsites.net')]",
-			"location": "West US",
-			"dependsOn": [
-				"[resourceId('Microsoft.Web/sites', parameters('sites_STTSampleApp_name'))]"
-			],
-			"properties": {
-				"siteName": "STTSampleApp",
-				"hostNameType": "Verified"
-			}
-		},
-		{
-			"type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-			"apiVersion": "2020-08-01-preview",
-			"name": "[concat(parameters('storageAccounts_storageaccountsttsa96b8_name'), '/default/azure-webjobs-hosts')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_storageaccountsttsa96b8_name'), 'default')]",
-				"[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountsttsa96b8_name'))]"
-			],
-			"properties": {
-				"defaultEncryptionScope": "$account-encryption-key",
-				"denyEncryptionScopeOverride": false,
-				"publicAccess": "None"
-			}
-		},
-		{
-			"type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-			"apiVersion": "2020-08-01-preview",
-			"name": "[concat(parameters('storageAccounts_storageaccountsttsa96b8_name'), '/default/azure-webjobs-secrets')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_storageaccountsttsa96b8_name'), 'default')]",
-				"[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountsttsa96b8_name'))]"
-			],
-			"properties": {
-				"defaultEncryptionScope": "$account-encryption-key",
-				"denyEncryptionScopeOverride": false,
-				"publicAccess": "None"
-			}
-		},
-		{
-			"type": "Microsoft.Storage/storageAccounts/fileServices/shares",
-			"apiVersion": "2020-08-01-preview",
-			"name": "[concat(parameters('storageAccounts_storageaccountsttsa96b8_name'), '/default/sttsampleapp9800')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageAccounts_storageaccountsttsa96b8_name'), 'default')]",
-				"[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountsttsa96b8_name'))]"
-			],
-			"properties": {
-				"accessTier": "TransactionOptimized",
-				"shareQuota": 5120,
-				"enabledProtocols": "SMB"
-			}
+                {
+                    "apiVersion": "2015-08-01",
+                    "name": "web",
+                    "type": "sourcecontrols",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('functionName'))]"
+                    ],
+                    "properties": {
+                        "RepoUrl": "[parameters('repoUrl')]",
+                        "branch": "[parameters('branch')]",
+                        "IsManualIntegration": true
+                    }
+                }
+			]
 		}
-	]
+    ]
 }
