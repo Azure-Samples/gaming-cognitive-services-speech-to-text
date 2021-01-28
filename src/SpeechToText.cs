@@ -36,7 +36,6 @@ namespace SpeechToText
                 // Add your subscription key here
                 // If your resource isn't in WEST US, change the endpoints
                 Authentication auth = new Authentication("https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken", CSSubscriptionKey);
-                string host = "https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1";
 
                 try
                 {
@@ -64,7 +63,7 @@ namespace SpeechToText
                         request.Method = HttpMethod.Post;
 
                         // Construct the URI
-                        request.RequestUri = new Uri(host + "?language=" + lang);
+                        request.RequestUri = new Uri(Constants.AzureSpeechToTextURL + "?language=" + lang);
 
                         // Set the content to be the WAV file at 256 kbps, 16 kHz, mono
                         byte[] AudioFile = new byte[req.Body.Length];
