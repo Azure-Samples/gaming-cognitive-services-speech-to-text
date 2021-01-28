@@ -12,7 +12,7 @@ description: "Help bring everyone into the conversation by converting speech aud
 
 # Speech to Text for Gaming - Reference Architecture
 
-Help bring everyone into the conversation by converting speech audio to text.
+Help bring everyone into the conversation using the Speech to Text Cognitive Service provided by Azure.
 
 ## Deploy
 
