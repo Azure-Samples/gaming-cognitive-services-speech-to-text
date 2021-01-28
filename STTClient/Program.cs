@@ -33,8 +33,7 @@ namespace STTClient
                     request.Method = HttpMethod.Post;
 
                     // Construct the URI
-                    //request.RequestUri = new Uri("http://localhost:7071/api/SpeechToText");
-                    request.RequestUri = new Uri("https://sttsampleapp.azurewebsites.net/api/speechtotext?code=kMiHP6JmOV7KrV2JTt27ZoIBJuXD3KJNpbCgboqimhabkaZD/1sxqg==");
+                    request.RequestUri = new Uri("https://" + Constants.STTFunction + ".azurewebsites.net/api/speechtotext?code=" + Constants.STTKey);
 
                     // Set the content to be the WAV file at 256 kbps, 16 kHz, mono
                     request.Content = new ByteArrayContent(File.ReadAllBytes("sample.wav"));
