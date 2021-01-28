@@ -74,7 +74,7 @@
 		},
 		"branch": {
 			"type": "string",
-			"defaultValue": "master"
+			"defaultValue": "main"
         }
     },
     "variables": {
