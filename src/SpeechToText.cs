@@ -34,8 +34,7 @@ namespace SpeechToText
                 string accessToken;
 
                 // Add your subscription key here
-                // If your resource isn't in WEST US, change the endpoints
-                Authentication auth = new Authentication("https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken", CSSubscriptionKey);
+                Authentication auth = new Authentication(Constants.AzureKeyURL, CSSubscriptionKey);
 
                 try
                 {
